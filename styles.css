@@ -1509,3 +1509,41 @@ textarea.form-control {
     height: calc(100vh - 70px);
   }
 }
+
+/* Ajuste para o header em dispositivos móveis */
+@media (max-width: 768px) {
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.03);
+  }
+
+  /* Adicionar espaço no topo para compensar o header fixo */
+  body {
+    padding-top: 70px;
+    /* Ajuste esse valor para corresponder à altura do seu header */
+  }
+
+  /* Ajustar a posição do menu mobile */
+  .nav-menu {
+    top: 70px;
+    /* Mesmo valor do padding-top do body */
+  }
+}
+
+/* Se necessário, ajuste para telas menores */
+@media (max-width: 576px) {
+  body {
+    padding-top: 60px;
+    /* Altura menor para telas menores */
+  }
+
+  .nav-menu {
+    top: 60px;
+    /* Mesmo valor do padding-top do body */
+  }
+}
