@@ -1,15 +1,106 @@
+document.addEventListener('DOMContentLoaded', function () {
+  // Função para lidar com o menu mobile
+  const hamburger = document.querySelector('.hamburger');
+  const navMenu = document.querySelector('.nav-menu');
+  const navLinks = document.querySelectorAll('.nav-link');
 
-// Função para lidar com o menu mobile
-const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
+  if (hamburger) {
+    hamburger.addEventListener('click', function () {
+      navMenu.classList.toggle('active');
+      hamburger.classList.toggle('active');
+      document.body.classList.toggle('no-scroll'); // Impede rolagem quando menu está aberto
+    });
+  }
 
-if (hamburger) {
-  hamburger.addEventListener('click', () => {
-    navMenu.classList.toggle('active');
-    hamburger.classList.toggle('active');
+  // Marca o link ativo com base na seção visível
+  function setActiveNavLink() {
+    const scrollPosition = window.scrollY;
+
+    // Obtém todas as seções
+    const sections = document.querySelectorAll('section');
+
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - 100;
+      const sectionHeight = section.offsetHeight;
+      const sectionId = section.getAttribute('id');
+
+      if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+        // Remove a classe 'active' de todos os links
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+        });
+
+        // Adiciona a classe 'active' ao link correspondente à seção atual
+        const activeLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
+        if (activeLink) {
+          activeLink.classList.add('active');
+        }
+      }
+    });
+
+    // Caso especial para o topo da página (início)
+    if (scrollPosition < 100) {
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+      });
+      const homeLink = document.querySelector('.nav-link[href="#"]');
+      if (homeLink) {
+        homeLink.classList.add('active');
+      }
+    }
+  }
+
+  // Chama a função quando a página carrega e quando rola
+  window.addEventListener('scroll', setActiveNavLink);
+  setActiveNavLink();
+
+  // Garante que o menu feche após clicar em um link (em dispositivos móveis)
+  navLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      // Obtém o id do alvo
+      const targetId = this.getAttribute('href');
+
+      // Se for um link interno (começa com #)
+      if (targetId.startsWith('#')) {
+        e.preventDefault();
+
+        // Se for apenas # (home), rola para o topo
+        if (targetId === '#') {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        } else {
+          // Caso contrário, rola até a seção correspondente
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            const headerHeight = document.querySelector('.header').offsetHeight;
+            window.scrollTo({
+              top: targetElement.offsetTop - headerHeight,
+              behavior: 'smooth'
+            });
+          }
+        }
+
+        // Fecha o menu mobile após clicar
+        if (navMenu.classList.contains('active')) {
+          navMenu.classList.remove('active');
+          hamburger.classList.remove('active');
+          document.body.classList.remove('no-scroll');
+        }
+      }
+    });
   });
-}
 
+  // Adiciona classe ao body para prevenir rolagem quando menu está aberto
+  document.head.insertAdjacentHTML('beforeend', `
+    <style>
+      .no-scroll {
+        overflow: hidden;
+      }
+    </style>
+  `);
+});
 // Função para adicionar classe ao cabeçalho quando rolar
 window.addEventListener('scroll', () => {
   const header = document.querySelector('.header');
