@@ -621,8 +621,11 @@ img {
 }
 
 .depoimentos-track {
+  min-height: 250px;
   display: flex;
   transition: transform 0.5s ease;
+  justify-content: center;
+  align-items: center;
 }
 
 .depoimento {
@@ -633,6 +636,19 @@ img {
   box-shadow: var(--shadow-soft);
   text-align: center;
   position: relative;
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+  width: 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .depoimento::before {
@@ -671,7 +687,7 @@ img {
 .slider-dots {
   display: flex;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 30px;
   gap: 12px;
 }
 
@@ -1054,14 +1070,17 @@ textarea.form-control {
     position: fixed;
     top: 80px;
     left: -100%;
-    width: 80%;
-    height: calc(100vh - 80px);
-    background-color: white;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.98);
     flex-direction: column;
     align-items: center;
-    padding: 50px 0;
+    justify-content: center;
+    padding: 0;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     transition: var(--transition);
+    z-index: 999;
+    backdrop-filter: blur(10px);
   }
 
   .nav-menu.active {
@@ -1069,7 +1088,28 @@ textarea.form-control {
   }
 
   .nav-item {
-    margin: 20px 0;
+    margin: 15px 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 15px 0;
+    font-size: 1.1rem;
+    width: 100%;
+  }
+
+  .nav-link:hover {
+    background-color: rgba(184, 150, 94, 0.1);
+  }
+
+  .hamburger {
+    z-index: 1000;
+  }
+
+  .hamburger span {
+    transition: 0.3s;
   }
 
   .hero-title {
