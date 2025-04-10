@@ -1547,3 +1547,69 @@ textarea.form-control {
     /* Mesmo valor do padding-top do body */
   }
 }
+
+/* Adicione estas regras ao final do seu arquivo styles.css */
+
+/* Correção para o header fixo em mobile */
+@media (max-width: 768px) {
+
+  /* Remover padding-top excessivo que estava causando scroll horizontal */
+  body {
+    padding-top: 0;
+    ;
+    overflow-x: hidden;
+    /* Prevenir scroll horizontal */
+  }
+
+  /* Corrigir altura e posicionamento do header */
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    /* Altura automática baseada no conteúdo */
+    z-index: 1000;
+  }
+
+  /* Ajustar o primeiro elemento após o header para compensar o espaço */
+  #hero {
+    padding-top: 80px;
+    /* Ajuste conforme a altura do seu header */
+  }
+
+  /* Corrigir posição do menu mobile */
+  .nav-menu {
+    top: 100%;
+    /* Posicionar logo abaixo do header */
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+
+  .logo {
+    margin-left: 1rem;
+  }
+
+  .hamburger {
+    margin-right: 1rem;
+  }
+
+  /* Ajustar container para evitar overflow */
+  .container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+/* Ajuste para telas ainda menores */
+@media (max-width: 576px) {
+  #hero {
+    padding-top: 70px;
+    /* Valor menor para telas menores */
+  }
+
+  .nav-menu {
+    height: calc(100vh - 70px);
+  }
+}
