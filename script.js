@@ -198,23 +198,175 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // ===== FORMULÁRIOS =====
-  // Formulário de contato
+  // Formulário de contato com validação e redirecionamento para WhatsApp/Email
   const formContato = document.getElementById('formContato');
   if (formContato) {
     formContato.addEventListener('submit', function (e) {
       e.preventDefault();
-      alert('Sua mensagem foi enviada com sucesso! Em breve entraremos em contato.');
-      this.reset();
-    });
-  }
 
-  // Formulário de newsletter
-  const newsletterForm = document.querySelector('.newsletter-form');
-  if (newsletterForm) {
-    newsletterForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      alert('Obrigado por assinar nossa newsletter!');
-      this.reset();
+      // Obter campos do formulário
+      const nome = document.getElementById('nome');
+      const email = document.getElementById('email');
+      const telefone = document.getElementById('telefone');
+      const assunto = document.getElementById('assunto');
+      const mensagem = document.getElementById('mensagem');
+
+      // Flag para controlar validação
+      let isValid = true;
+
+      // Função para exibir erro
+      function showError(input, message) {
+        const formGroup = input.parentElement;
+        const errorElement = formGroup.querySelector('.error-message') || document.createElement('div');
+
+        if (!formGroup.querySelector('.error-message')) {
+          errorElement.className = 'error-message';
+          formGroup.appendChild(errorElement);
+        }
+
+        errorElement.textContent = message;
+        input.classList.add('error');
+        isValid = false;
+      }
+
+      // Função para remover erro
+      function removeError(input) {
+        const formGroup = input.parentElement;
+        const errorElement = formGroup.querySelector('.error-message');
+
+        if (errorElement) {
+          formGroup.removeChild(errorElement);
+        }
+
+        input.classList.remove('error');
+      }
+
+      // Validar nome (não vazio)
+      if (nome.value.trim() === '') {
+        showError(nome, 'Por favor, informe seu nome');
+      } else {
+        removeError(nome);
+      }
+
+      // Validar email (formato correto)
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (email.value.trim() === '') {
+        showError(email, 'Por favor, informe seu email');
+      } else if (!emailRegex.test(email.value.trim())) {
+        showError(email, 'Por favor, informe um email válido');
+      } else {
+        removeError(email);
+      }
+
+      // Validar telefone se preenchido (opcional)
+      if (telefone.value.trim() !== '') {
+        const phoneRegex = /^(\(\d{2}\)|\d{2})\s?9?\d{4}-?\d{4}$/;
+        if (!phoneRegex.test(telefone.value.trim())) {
+          showError(telefone, 'Formato de telefone inválido. Ex: (11) 98765-4321');
+        } else {
+          removeError(telefone);
+        }
+      } else {
+        removeError(telefone);
+      }
+
+      // Validar assunto (seleção obrigatória)
+      if (assunto.value === '') {
+        showError(assunto, 'Por favor, selecione um assunto');
+      } else {
+        removeError(assunto);
+      }
+
+      // Validar mensagem (não vazia e com tamanho mínimo)
+      if (mensagem.value.trim() === '') {
+        showError(mensagem, 'Por favor, escreva sua mensagem');
+      } else if (mensagem.value.trim().length < 10) {
+        showError(mensagem, 'A mensagem deve ter pelo menos 10 caracteres');
+      } else {
+        removeError(mensagem);
+      }
+
+      // Se o formulário for válido, encaminhar para WhatsApp ou Email
+      if (isValid) {
+        // Mostrar modal de opções
+        showContactOptions(nome.value, email.value, telefone.value, assunto.options[assunto.selectedIndex].text, mensagem.value);
+      }
     });
+
+    // Função para mostrar opções de contato (WhatsApp ou Email)
+    function showContactOptions(nome, email, telefone, assunto, mensagem) {
+      // Criar o modal
+      const modal = document.createElement('div');
+      modal.className = 'contact-modal';
+
+      // Mensagem formatada para WhatsApp
+      const whatsappMsg = encodeURIComponent(
+        `*Contato via Website - Monteiro & Associados*\n\n` +
+        `*Nome:* ${nome}\n` +
+        `*Email:* ${email}\n` +
+        `*Telefone:* ${telefone || 'Não informado'}\n` +
+        `*Assunto:* ${assunto}\n\n` +
+        `*Mensagem:*\n${mensagem}`
+      );
+
+      // Mensagem formatada para Email (assunto + corpo)
+      const emailSubject = encodeURIComponent(`Contato via Website - ${assunto}`);
+      const emailBody = encodeURIComponent(
+        `Nome: ${nome}\n` +
+        `Email: ${email}\n` +
+        `Telefone: ${telefone || 'Não informado'}\n` +
+        `Assunto: ${assunto}\n\n` +
+        `Mensagem:\n${mensagem}`
+      );
+
+      // Número de WhatsApp (substitua pelo número correto - formato: 5511999999999)
+      const whatsappNumber = '5511999999999';
+
+      // Email de destino (substitua pelo email correto)
+      const targetEmail = 'contato@monteiroadvogados.com.br';
+
+      // Conteúdo do modal
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h3>Como deseja prosseguir?</h3>
+          <p>Escolha como deseja enviar sua mensagem:</p>
+          <div class="contact-options">
+            <a href="https://wa.me/${whatsappNumber}?text=${whatsappMsg}" target="_blank" class="btn-whatsapp">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              Enviar por WhatsApp
+            </a>
+            <a href="mailto:${targetEmail}?subject=${emailSubject}&body=${emailBody}" class="btn-email">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+              Enviar por Email
+            </a>
+          </div>
+          <button class="btn-close">Fechar</button>
+        </div>
+      `;
+
+      // Adicionar modal ao body
+      document.body.appendChild(modal);
+
+      // Mostrar modal com animação
+      setTimeout(() => {
+        modal.classList.add('active');
+      }, 10);
+
+      // Adicionar evento para fechar o modal
+      const closeBtn = modal.querySelector('.btn-close');
+      closeBtn.addEventListener('click', () => {
+        modal.classList.remove('active');
+        setTimeout(() => {
+          document.body.removeChild(modal);
+        }, 300);
+
+        // Resetar o formulário após fechar o modal
+        formContato.reset();
+      });
+    }
   }
 });
